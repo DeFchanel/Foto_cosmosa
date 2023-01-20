@@ -7,17 +7,14 @@ import datetime
 load_dotenv()
 
 
-count = 30
+
 dir_name = 'images'
 filename = 'hubble.jpeg'
 filename2 = 'pop.jpeg'
 nasa_token = os.getenv('NASA_TOKEN')
 file_path = os.path.join(dir_name, filename)
 os.makedirs(dir_name, exist_ok=True)
-payload = {
-    'api_key': nasa_token,
-    'count': count
-}
+
 payload_epic = {
     'api_key': nasa_token
 }
@@ -34,7 +31,7 @@ def download_img(file_path, url, params=None):
         file.write(response.content)
 
 
-def fetch_spacex_last_launch(url_spacex):
+def fetch_spacex_last_launch(url):
     response1 = requests.get(url)
     response1.raise_for_status
     links = (response1.json()['links']['flickr']['original'])
@@ -45,15 +42,22 @@ def fetch_spacex_last_launch(url_spacex):
 
 
 def download_img_nasa(url):
+    count = 30
+    payload = {
+    'api_key': nasa_token,
+    'count': count
+    }
     nasa_response = requests.get(url, params=payload)
     nasa_response.raise_for_status
     links = nasa_response.json()
-    for link in range(count):
-        nasa_photo_url = links[link]['hdurl']
+    for number, image in enumerate(links):
+        if image['media_type'] == 'video':
+            continue
+        nasa_photo_url = image['hdurl']
         parse = urlparse(nasa_photo_url)
         parse_path = parse.path
         extension = get_file_extension(parse_path)
-        filename = f'nasa_apod_{link}.{extension}'
+        filename = f'nasa_apod_{number}.{extension}'
         file_path = os.path.join(dir_name, filename)
         download_img(file_path, nasa_photo_url)
 
@@ -77,5 +81,3 @@ def get_epic_photo(url_epic):
         download_img(file_path, epic_url, params=payload_epic)
 
 
-fetch_spacex_last_launch(url_spacex)
-#get_epic_photo(url_epic)

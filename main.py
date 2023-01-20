@@ -27,24 +27,21 @@ nasa_url = 'https://api.nasa.gov/planetary/apod'
 url_epic = 'https://api.nasa.gov/EPIC/api/natural'
 
 
-def download_img(file_path, url):
-    response = requests.get(url)
+def download_img(file_path, url, params=None):
+    response = requests.get(url, params=params)
     response.raise_for_status()
     with open(file_path, 'wb') as file:
         file.write(response.content)
 
 
-def fetch_spacex_last_launch(url):
+def fetch_spacex_last_launch(url_spacex):
     response1 = requests.get(url)
     response1.raise_for_status
     links = (response1.json()['links']['flickr']['original'])
     for link_number, link in enumerate(links):
-        response2 = requests.get(link)
-        response2.raise_for_status()
-        filename1 = f'spacex_{link_number}.jpeg'
-        file_path1 = os.path.join(dir_name, filename1)
-        with open(file_path1, 'wb') as file:
-            file.write(response2.content)
+        filename = f'spacex_{link_number}.jpeg'
+        file_path = os.path.join(dir_name, filename)
+        download_img(file_path, link)
 
 
 def download_img_nasa(url):
@@ -56,12 +53,9 @@ def download_img_nasa(url):
         parse = urlparse(nasa_photo_url)
         parse_path = parse.path
         extension = get_file_extension(parse_path)
-        nasa_response2 = requests.get(nasa_photo_url)
-        nasa_response2.raise_for_status()
         filename = f'nasa_apod_{link}.{extension}'
         file_path = os.path.join(dir_name, filename)
-        with open(file_path, 'wb') as file:
-            file.write(nasa_response2.content)
+        download_img(file_path, nasa_photo_url)
 
 
 def get_file_extension(parse_path):
@@ -73,17 +67,15 @@ def get_epic_photo(url_epic):
     response = requests.get(url_epic, params=payload_epic)
     response.raise_for_status()
     for number, image in enumerate(response.json()):
-        filename_epic = f'nasa_epic_{number}.png'
-        file_path1 = os.path.join(dir_name, filename_epic)
+        filename = f'nasa_epic_{number}.png'
+        file_path = os.path.join(dir_name, filename)
         image_name = response.json()[number]['image']
         image_date1 = response.json()[number]['date']
         image_date = datetime.datetime.fromisoformat(image_date1)
         formatted_image_date = image_date.strftime("%Y/%m/%d")
-        response_im = requests.get(f'https://api.nasa.gov/EPIC/archive/natural/{formatted_image_date}/png/{image_name}.png', params=payload_epic)
-        response_im.raise_for_status()
-        with open(file_path1, 'wb') as file:
-            file.write(response_im.content)
+        epic_url = f'https://api.nasa.gov/EPIC/archive/natural/{formatted_image_date}/png/{image_name}.png'
+        download_img(file_path, epic_url, params=payload_epic)
 
 
-
-get_epic_photo(url_epic)
+fetch_spacex_last_launch(url_spacex)
+#get_epic_photo(url_epic)

@@ -4,15 +4,6 @@ import os
 import argparse
 
 
-dir_name = 'images'
-os.makedirs(dir_name, exist_ok=True)
-parser = argparse.ArgumentParser(
-    description='Программа скачивает фото Spacex по указанному вами ID запуска'
-)
-parser.add_argument('ID', help='ID запуска')
-args = parser.parse_args()
-spacex_launch_id = args.ID
-
 
 def fetch_spacex_last_launch():
     response1 = requests.get(f'https://api.spacexdata.com/v5/launches/{spacex_launch_id}')
@@ -23,4 +14,13 @@ def fetch_spacex_last_launch():
         file_path = os.path.join(dir_name, filename)
         download_img(file_path, link)
 
-fetch_spacex_last_launch()
+if __name__ == '__main__':
+    dir_name = 'images'
+    os.makedirs(dir_name, exist_ok=True)
+    parser = argparse.ArgumentParser(
+        description='Программа скачивает фото Spacex по указанному вами ID запуска'
+    )
+    parser.add_argument('id', help='ID запуска')
+    args = parser.parse_args()
+    spacex_launch_id = args.id
+    fetch_spacex_last_launch()

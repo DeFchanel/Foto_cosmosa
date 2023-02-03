@@ -3,12 +3,7 @@ from dotenv import load_dotenv
 import requests
 import os
 from urllib.parse import urlparse
-load_dotenv()
 
-
-dir_name = 'images'
-os.makedirs(dir_name, exist_ok=True)
-nasa_token = os.getenv('NASA_TOKEN')
 
 
 def get_file_extension(parse_path):
@@ -32,8 +27,13 @@ def download_img_nasa():
         parse = urlparse(nasa_photo_url)
         parse_path = parse.path
         extension = get_file_extension(parse_path)
-        filename = f'nasa_apod_{number}.{extension}'
+        filename = f'nasa_apod_{number}{extension}'
         file_path = os.path.join(dir_name, filename)
         download_img(file_path, nasa_photo_url)
 
-download_img_nasa()
+if __name__ == '__main__':
+    load_dotenv()
+    dir_name = 'images'
+    os.makedirs(dir_name, exist_ok=True)
+    nasa_token = os.getenv('NASA_TOKEN')
+    download_img_nasa()

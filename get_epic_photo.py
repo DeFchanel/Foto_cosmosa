@@ -3,12 +3,7 @@ import os
 import datetime
 from dotenv import load_dotenv
 from download_img import download_img
-load_dotenv()
 
-
-dir_name = 'images'
-os.makedirs(dir_name, exist_ok=True)
-nasa_token = os.getenv('NASA_TOKEN')
 
 
 def get_epic_photo():
@@ -27,4 +22,10 @@ def get_epic_photo():
         epic_url = f'https://api.nasa.gov/EPIC/archive/natural/{formatted_image_date}/png/{image_name}.png'
         download_img(file_path, epic_url, params=payload_epic)
 
-get_epic_photo()
+
+if __name__ == '__main__':
+    load_dotenv()
+    dir_name = 'images'
+    os.makedirs(dir_name, exist_ok=True)
+    nasa_token = os.getenv('NASA_TOKEN')
+    get_epic_photo()

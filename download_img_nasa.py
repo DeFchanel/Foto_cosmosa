@@ -11,14 +11,14 @@ def get_file_extension(parse_path):
     return extension[1]
 
 
-def download_img_nasa():
+def download_imgs_nasa(nasa_token):
     count = 30
     payload = {
     'api_key': nasa_token,
     'count': count
     }
     nasa_response = requests.get('https://api.nasa.gov/planetary/apod', params=payload)
-    nasa_response.raise_for_status
+    nasa_response.raise_for_status()
     links = nasa_response.json()
     for number, image in enumerate(links):
         if image['media_type'] == 'video':
@@ -36,4 +36,4 @@ if __name__ == '__main__':
     dir_name = 'images'
     os.makedirs(dir_name, exist_ok=True)
     nasa_token = os.getenv('NASA_TOKEN')
-    download_img_nasa()
+    download_imgs_nasa(nasa_token)
